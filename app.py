@@ -27,8 +27,6 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import FAISS
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain.chains import ConversationalRetrievalChain
-from langchain.memory import ConversationBufferWindowMemory
 from langchain_core.documents import Document
 from langchain_core.prompts import PromptTemplate
 
@@ -488,33 +486,30 @@ def build_llm(api_key: str):
     )
 
 
+class SimpleRAG:
+    def __init__(self, api_key: str):
+        self.vector_store = build_vector_store()
+        self.llm = build_llm(api_key)
+        self.retriever = self.vector_store.as_retriever(search_kwargs={"k": 5})
+        self.prompt = PromptTemplate(
+            input_variables=["context", "question"],
+            template=SYSTEM_PROMPT,
+        )
+
+    def __call__(self, inputs: dict):
+        question = inputs["question"]
+        docs = self.retriever.invoke(question)
+        context = "\n\n".join(doc.page_content for doc in docs)
+        prompt_text = self.prompt.format(context=context, question=question)
+        response = self.llm.invoke(prompt_text)
+        return {
+            "answer": response.content,
+            "source_documents": docs
+        }
+
 def build_chain(api_key: str):
-    """Build the ConversationalRetrievalChain."""
-    vector_store = build_vector_store()
-    llm          = build_llm(api_key)
-    retriever    = vector_store.as_retriever(
-        search_type="similarity",
-        search_kwargs={"k": 5},
-    )
-    prompt = PromptTemplate(
-        input_variables=["context", "question"],
-        template=SYSTEM_PROMPT,
-    )
-    memory = ConversationBufferWindowMemory(
-        k=6,
-        memory_key="chat_history",
-        return_messages=False,
-        output_key="answer",
-    )
-    chain = ConversationalRetrievalChain.from_llm(
-        llm=llm,
-        retriever=retriever,
-        memory=memory,
-        combine_docs_chain_kwargs={"prompt": prompt},
-        return_source_documents=True,
-        verbose=False,
-    )
-    return chain
+    """Build the RAG Chain."""
+    return SimpleRAG(api_key)
 
 
 # ─────────────────────────────────────────────────────────────────────────────
