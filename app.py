@@ -58,6 +58,12 @@ st.markdown("""
       border: 1px solid rgba(255,255,255,0.4);
       color: #fff !important;
   }
+  [data-testid="stSidebar"] button * {
+      color: #00529C !important;
+  }
+  [data-testid="stSidebar"] button p {
+      font-weight: 600;
+  }
   [data-testid="stSidebar"] hr { border-color: rgba(255,255,255,0.25); }
 
   /* ── Header ── */
