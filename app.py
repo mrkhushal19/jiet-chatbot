@@ -485,9 +485,9 @@ def build_vector_store():
 
 @st.cache_resource(show_spinner="🤖 Loading Gemini LLM...")
 def build_llm(api_key: str):
-    """Initialise Gemini 1.5 Flash LLM via LangChain."""
+    """Initialise Gemini LLM via LangChain."""
     return ChatGoogleGenerativeAI(
-        model="gemini-1.5-flash",
+        model="gemini-2.5-flash",
         google_api_key=api_key,
         temperature=0.3,
         max_output_tokens=1024,
