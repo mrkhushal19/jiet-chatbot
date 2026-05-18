@@ -535,13 +535,9 @@ with st.sidebar:
     st.markdown("**AI Chatbot — Powered by Gemini**")
     st.markdown("---")
 
-    # API Key Management
+    # API Key Hardcoded
     st.markdown("### 🔑 System Connection")
-    
-    # Check secrets first, fallback to manual input
-    api_key = st.secrets.get("GEMINI_API_KEY", "")
-    if not api_key:
-        api_key = st.text_input("Enter Gemini API Key:", type="password")
+    api_key = "AIzaSyDr2uM-SkUkwCOvKbDgOsDT-h3BKAYYsd4"
 
     if not st.session_state.api_key_set or st.session_state.chain is None:
         if api_key:
