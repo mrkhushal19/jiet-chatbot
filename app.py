@@ -29,8 +29,8 @@ from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain.chains import ConversationalRetrievalChain
 from langchain.memory import ConversationBufferWindowMemory
-from langchain.schema import Document
-from langchain.prompts import PromptTemplate
+from langchain_core.documents import Document
+from langchain_core.prompts import PromptTemplate
 
 # ─────────────────────────────────────────────────────────────────────────────
 #  PAGE CONFIG
@@ -448,11 +448,6 @@ CONTEXT (from RAG retrieval — use this to answer):
 {context}
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-CONVERSATION HISTORY:
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-{chat_history}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 STUDENT QUESTION:
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 {question}
@@ -502,7 +497,7 @@ def build_chain(api_key: str):
         search_kwargs={"k": 5},
     )
     prompt = PromptTemplate(
-        input_variables=["context", "chat_history", "question"],
+        input_variables=["context", "question"],
         template=SYSTEM_PROMPT,
     )
     memory = ConversationBufferWindowMemory(
