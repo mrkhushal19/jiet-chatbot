@@ -22,6 +22,9 @@ Run:
 import os
 import time
 import streamlit as st
+from dotenv import load_dotenv
+
+load_dotenv()
 
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.vectorstores import FAISS
@@ -535,9 +538,9 @@ with st.sidebar:
     st.markdown("**AI Chatbot — Powered by Gemini**")
     st.markdown("---")
 
-    # API Key Hardcoded
+    # API Key via Environment Variable
     st.markdown("### 🔑 System Connection")
-    api_key = "AIzaSyDr2uM-SkUkwCOvKbDgOsDT-h3BKAYYsd4"
+    api_key = os.environ.get("GEMINI_API_KEY", "")
 
     if not st.session_state.api_key_set or st.session_state.chain is None:
         if api_key:
