@@ -538,13 +538,18 @@ with st.sidebar:
     st.markdown("**AI Chatbot — Powered by Gemini**")
     st.markdown("---")
 
-    # API Key via Environment Variable
+    # API Key via Environment Variable or Secrets
     st.markdown("### 🔑 System Connection")
-    api_key = os.environ.get("GEMINI_API_KEY", "")
+    
+    try:
+        api_key = st.secrets.get("GEMINI_API_KEY") or os.environ.get("GEMINI_API_KEY", "")
+    except Exception:
+        api_key = os.environ.get("GEMINI_API_KEY", "")
 
-    if not st.session_state.api_key_set or st.session_state.chain is None:
-        if api_key:
-            with st.spinner("Initialising advanced RAG system..."):
+    if not api_key:
+        st.error("⚠️ API Key missing! Please add GEMINI_API_KEY to Streamlit Secrets (or local .env).")
+    elif not st.session_state.api_key_set or st.session_state.chain is None:
+        with st.spinner("Initialising advanced RAG system..."):
                 try:
                     st.session_state.chain       = build_chain(api_key)
                     st.session_state.api_key_set = True
@@ -675,7 +680,10 @@ user_input = st.chat_input(
 
 if user_input:
     if st.session_state.chain is None:
-        st.warning("⚠️ Chatbot is still initialising. Please wait a moment.")
+        if not api_key:
+            st.error("⚠️ The chatbot cannot answer because the Gemini API key is missing. Please add it to your Streamlit settings!")
+        else:
+            st.warning("⚠️ Chatbot is still initialising. Please wait a moment.")
     else:
         # Add user message
         st.session_state.messages.append({"role": "user", "content": user_input})
