@@ -535,18 +535,23 @@ with st.sidebar:
     st.markdown("**AI Chatbot — Powered by Gemini**")
     st.markdown("---")
 
-    # API Key Hardcoded
+    # API Key Management
     st.markdown("### 🔑 System Connection")
-    api_key = "AIzaSyBgwcrf6JtKrsXvuQlsazIiWHQOSD9pFKY"
+    
+    # Check secrets first, fallback to manual input
+    api_key = st.secrets.get("GEMINI_API_KEY", "")
+    if not api_key:
+        api_key = st.text_input("Enter Gemini API Key:", type="password")
 
     if not st.session_state.api_key_set or st.session_state.chain is None:
-        with st.spinner("Initialising advanced RAG system..."):
-            try:
-                st.session_state.chain       = build_chain(api_key)
-                st.session_state.api_key_set = True
-                st.success("✅ Advanced Chatbot ready!")
-            except Exception as e:
-                st.error(f"❌ Error: {e}")
+        if api_key:
+            with st.spinner("Initialising advanced RAG system..."):
+                try:
+                    st.session_state.chain       = build_chain(api_key)
+                    st.session_state.api_key_set = True
+                    st.success("✅ Advanced Chatbot ready!")
+                except Exception as e:
+                    st.error(f"❌ Error: {e}")
 
     st.markdown("---")
     st.markdown("### 💬 Quick Questions")
